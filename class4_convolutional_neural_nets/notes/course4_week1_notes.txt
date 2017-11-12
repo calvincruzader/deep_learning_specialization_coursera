@@ -1,0 +1,109 @@
+Convolutional Neural Networks 
+
+Computer Vision 
+	examples of computer vision problems: image classification, object detection, neural style transfer
+	a challenge of computer vision problem is that inputs can get really big 
+		1000pixels x 1000pixels x 3rgb = 3million inputs for a NN 
+			assume a subsequent layer to be 1000 units and you'd have (1000, 3mil) = 3 billion parameters lmfao 
+				prone to overfitting 
+				computational requirements is huge 
+	
+Edge Detection through convolutions 
+	motivation: detect vertical and horizontal edges 
+	(3x3) filter/kernel 
+	
+	(6x6)image convolved by (3x3)filter/kernel = (4x4)convolved_image 
+		python: conv_forward 
+		tensorflow: tf.nn.conv2d
+		keras: Conv2D
+
+More Edge Detection
+	if you don't care about the light to darkness, you can take the absolute values of the convolved image   
+	
+	different filter/kernels will allow you to find vertical and horizontal edges
+	
+	vertical detectors: Sobel filter/ Scharr filter 
+	
+	maybe you want the filter/kernel to be learned for custom edges! wtf 
+	
+padding 
+	valid convolution : no padding 
+	same convolution : input_image.shape == convolved_image.shape 
+		p  = (f - 1) / 2
+	
+strided convolutions 
+	stride = step_size of convolution (both horizontal and vertical directions)
+		convolved_image.shape = floor((n + 2p -f) /s + 1) x floor((n + 2p -f) / s + 1)
+	why would we want to stride?
+	
+cross-correlation vs convolution 
+	we're actually doing cross-correlation according to math definition
+	actual convolutions flip filter on x and y axis before doing element-wise product 
+	BUT by convention we just call it convolution operator 
+	
+convolutions over volumes 
+	filter.shape(3x3x3)
+		the third dimension of the filter = the number of channels of the input 
+	example: image.shape(6x6x3) convolved by filter.shape(3x3x3) = image.shape(4x4)
+	can detect edges for various RGB channels 
+	
+	multiple convolutions in the same layer will create an output (convolved_image) with the # channels = # convolutions of the layer previous 
+		#filters_layer_l = # channels_layer_l+1 
+	channels = depth but depth can also refer to depth of a neural network, so we use channels for terminology
+	
+one layer of a convolutional neural network 
+	input convolved by filters = convolved_images -> nonlinearity_function(convolved_image + bias) = input for next layer 
+	
+	! the number of parameters stays constant no matter the input size since the parameters are based on the filter/kernel and not directly related to the number of inputs 
+	
+example ConvNet 
+	work in designing convnets is deciding hyperparameters 
+		get in to how to make better decisions of this later 
+		
+pooling layer 
+	max pooling : break an input into regions and find the max of each region 
+	intuition : there's some feature that exists in some portion of the input, keep it for future calculations. Other inputs that don't have a high max value don't have that particular feature in their portion of the input 
+		Ng isn't sure if this is true 
+	no parameters to learn!
+	(n +2p -f) / s + 1 works too 
+	
+	average pooling : break an input into regions and take the average of each region
+		not used as often in neural nets 
+		
+CNN example 
+	usually, input -> conv1 -> pool1 -> conv2 -> pool2 -> fc3 -> fc4 -> softmax 
+	
+	points to note about CNNs
+		# activation units goes down the deeper the layer gets 
+		# parameters, for pool layers = 0, conv layers = small, fc layers =  large to smallerish 
+		
+Why convolutions?
+	two main adv cnn have over standard fc nn:
+		parameter sharing : a feature detector (like edge detector) that's useful in one part of an image is probably useful in another part of the image 
+		sparcity of connections : in each layer, each output value depends only a on a small number of inputs 
+		
+programming assignment: convolutional model: step by step 
+	main benefits of padding: 
+		allows use of a conv layer without shrinking height or width of the volumes 
+		allows to keep more information at the border of an image 
+	implemented:
+		a layer of a convolutional neural network which included the convolution layer and a pooling layer 
+	
+programming assignment: convolutional neural networks: application 
+	-tf.nn.conv2d(X,W1, strides = [1,s,s,1], padding = 'SAME'): given an input  XX  and a group of filters  W1W1 , this function convolves  W1W1 's filters on X. The third input ([1,f,f,1]) represents the strides for each dimension of the input (m, n_H_prev, n_W_prev, n_C_prev). 
+	-tf.nn.max_pool(A, ksize = [1,f,f,1], strides = [1,s,s,1], padding = 'SAME'): given an input A, this function uses a window of size (f, f) and strides of size (s, s) to carry out max pooling over each window. You can read the full documentation here
+	-tf.nn.relu(Z1): computes the elementwise ReLU of Z1 (which can be any shape). You can read the full documentation here.
+	-tf.contrib.layers.flatten(P): given an input P, this function flattens each example into a 1D vector it while maintaining the batch-size. It returns a flattened tensor with shape [batch_size, k]. You can read the full documentation here.
+	-tf.contrib.layers.fully_connected(F, num_outputs): given a the flattened input F, it returns the output computed using a fully connected layer. You can read the full documentation here.
+		
+		
+		
+	
+	
+	
+	
+	
+	
+	
+	
+	

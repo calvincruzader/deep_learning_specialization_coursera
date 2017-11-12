@@ -1,0 +1,132 @@
+course4_week2_notes 
+----------------------
+Case Studies:
+----------------------
+why look at case studies?
+	to gain intuition of how to build NNs 
+	plus, many convNet architectures can be transferred from one problem to another 
+
+classic networks 
+	LeNet-5: LeCun et al., 1998. Gradient-based learning applied to document recognition 
+		goal: recognize handwritten digits 
+		patterns that we still see today: 
+			n_H, n_W go down while n_C goes up
+			conv/pool -> conv/ pool -> fc -> fc 
+	AlexNet: Krizhevsky et all., 2012. ImageNet classification with deep convolutional neural networks 
+		similar to LeNet but much bigger, 60mil parameters 
+			demonstrates scaling of a robust architecture despite much more data  
+		used ReLU 
+		Local response normalization (LRN)
+	VGG-16: Simonyan & Zisserman 2015. Very deep convolutional networks for large-scale image recognition 
+		simplified neural network architectures 
+		all conv layers = 3x3 filters, s=1, same convolution, max_pool = 2x2, s=2
+			number of filters for convolutions doubles until 512 (64 to 512)
+		
+ResNets 
+	vanishing and exploding gradient is a big problem, resnets take care of that 
+	Residual Network 
+	Residual block 
+		a^[l+2] = g(z^[l+2] + a^[l]) = g(W^[l+2]a^[l+1] + b^[l+2]) 
+		if you're using L2 regularization, W^[l+2] will tend to shrink, and if W^[l+2] = 0, then g(a^[l]) = a^[l]
+			the identity function is easy for residual block to learn!
+			you'll need a^[l+2].shape = a^[l].shape to add in the residual block, so 'same' convolutions are used during these skip connection steps 
+				if not, just multiply a^[l] with a weight matrix to get the dimensions to match 
+		added shortcut is called a 'skip connection'
+	Residual blocks allows you to train much deeper neural networks 
+		
+	training error keeps on going down as the number of layers increases (whereas in plain networks, the training error goes up after a certain point when the neural network has 'too many' layers)
+		takes care of vanishing and exploding gradient problem 
+		
+	thoughts/my own words: neurons skip any vanishing or exploding functionality that might happen in the very next layer, so that, just in case the neurons DO vanish/explode with that next function, there'll be a fallback of a section of the next non-linearity that does not get impacted by vanishing/exploding
+		
+Why do ResNets work?
+	provides a baseline such that the activation of later layers cannot get worse, only as bad as that previous layer 
+		makes training error pretty much a non increasing function of the number of layers in a neural network 
+			doesn't hurt performance 
+			
+	He et al. 2015. Deep residual networks for image recognition 
+	
+1x1 convolutions aka  Networks in Networks : Lin et al. 2013. Network in Network 
+	focuses on the number of channels in a current layer so that you can mutate it (increase/decrease/stay constant) in the next layer 
+	
+	also, can focus on getting FC networks on channels and get nonlinearity to get a more complex function
+		
+	my own words: 
+		doing 1x1 convolutions makes sense when you want to focus on the number of channels of a given layer. you can shrink/increase/maintain the size of the input channels by giving a smaller/larger/same size number of filters. 
+		doing 1x1 convolutions also makes sense when you want to feed the input into a nonlinear activation function by channel (giving a fc layer such that (number input channels convolved_by number of filters -> number output channels)
+
+Inception network motivation : Szegedy et al. 2014. Going deeper with convolutions 
+	inception layer : lets do all the layers! don't have to choose which layer you do, lol just do them all and stack em up 
+		try 1x1, 3x3, 5x5, maxpoolb  and stack the filters them all up side by side, concatenate
+		let the NN learn whatever parameters it wants to use or whatever convolution filter sizes it wants 
+			the problem here is computational cost
+	use 1x1 convolution to reduce the number of channels of a layer to reduce the computational cost by an order of magnitude 
+		does shrinking down the representation size ('bottleneck layer') hurt the performance?
+			so long as you shrink down 'within reason' it doesn't hurt performance and saves alot on computation 
+		
+Inception network 
+	inception model repeated a bunch of times into a network 
+	GoogLeNet
+	
+----------------------	
+Practical advices for using ConvNets 
+----------------------
+Using open-source implementation 
+	advantages: 	
+		don't have to write up your own NNs 
+		MAYBE THE PARAMETERS ARE PRETRAINED???
+
+Transfer learning 
+	for small training sets that you have:
+		freeze parameters and train only your own custom softmax layer at the very end 
+	for larger training sets that you have:
+		freeze less layers 
+	for very large data that you have:
+		use the whole network as initialization! (replace random initialization) 
+	very worth SERIOUSLY CONSIDERING hehehehe
+		
+Data augmentation 
+	common to increase performance of a given system 
+		computer vision, we can't get enough data!
+	common data augmentation methods:
+		mirroring, random cropping, 
+		rotation, shearing, local warping
+		color shifting: RGB (+20,20,+20) or (-20,+20,+20)
+			the values RGB are drawn from some probability distribution 
+			principles components analysist : PCA color augmentation 
+				keep the overall color tint the same 
+				details in AlexNet paper 
+	implementing distortions 
+		have a CPU thread for doing distortions on mini batches 
+		have another CPU/GPU thread on training data
+			you can do both the above in parallel
+		
+the state of computer vision 
+	data vs. hand-engineering 
+		we have still we have more data for image recognition 
+		
+	little data, there's more hand-engineering going on 
+	 
+	learning algorithm for deep learning has two source of knowledge:
+		1.) labeled data 
+		2.) hand engineered (features/network architecture/ other components /transfer learning)
+			in the absence of lots of data, being good at (2) is beneficial 
+	
+	tips on doing well on benchmarks/winning competitions 
+		not really something you do in production 
+		ensembling 
+			train several NNs (3-15 networks) independently and average their outputs (maybe 1% or 2% better)
+		multi-crop at test time :
+			run a classifier on multiple versions of test images and average the results 
+			10crop 
+			
+--------------------------
+assignment2_ResNets
+	what is covariate shift? 
+		P_s(Y | X, theta) 
+			
+	
+	
+
+
+
