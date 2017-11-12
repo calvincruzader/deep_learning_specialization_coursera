@@ -1,4 +1,4 @@
-course4_week2_notes 
+course4_week2_notes: Deep Convolutional Models by Case Studies 
 --------------
 Case studies:
 --------------
